@@ -189,6 +189,14 @@ export default class SmartBanner {
     return this.options.hidePath ? this.options.hidePath : '/';
   }
 
+  get parentSelector() {
+    return this.options.parentSelector ? this.options.parentSelector : 'body';
+  }
+
+  get nextSiblingSelector() {
+    return this.options.nextSiblingSelector;
+  }
+
   publish() {
     if (Object.keys(this.options).length === 0) {
       throw new Error('No options detected. Please consult documentation.');
@@ -209,8 +217,13 @@ export default class SmartBanner {
       return false;
     }
 
+    const parent = document.querySelector(this.parentSelector);
+    if (!parent) {
+      return false;
+    }
     let bannerDiv = document.createElement('div');
-    document.querySelector('body').appendChild(bannerDiv);
+    let nextSibling = this.nextSiblingSelector ? document.querySelector(this.nextSiblingSelector) : null;
+    parent.insertBefore(bannerDiv, nextSibling);
     bannerDiv.outerHTML = this.html;
     let event = new Event('smartbanner.view');
     document.dispatchEvent(event);
@@ -226,7 +239,8 @@ export default class SmartBanner {
       restoreContentPosition();
     }
     let banner = document.querySelector('.js_smartbanner');
-    document.querySelector('body').removeChild(banner);
+    const parent = document.querySelector(this.parentSelector);
+    parent.removeChild(banner);
     let event = new Event('smartbanner.exit');
     document.dispatchEvent(event);
     Bakery.bake(this.hideTtl, this.hidePath);

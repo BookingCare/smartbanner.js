@@ -1,7 +1,3 @@
-/*!
- * smartbanner.js v1.19.0 <https://github.com/ain/smartbanner.js#readme>
- * Copyright © 2022 Ain Tohvri, contributors. Licensed under GPL-3.0.
- */
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
@@ -416,6 +412,16 @@ var SmartBanner = /*#__PURE__*/function () {
       return this.options.hidePath ? this.options.hidePath : '/';
     }
   }, {
+    key: "parentSelector",
+    get: function get() {
+      return this.options.parentSelector ? this.options.parentSelector : 'body';
+    }
+  }, {
+    key: "nextSiblingSelector",
+    get: function get() {
+      return this.options.nextSiblingSelector;
+    }
+  }, {
     key: "publish",
     value: function publish() {
       if (Object.keys(this.options).length === 0) {
@@ -437,8 +443,15 @@ var SmartBanner = /*#__PURE__*/function () {
         return false;
       }
 
+      var parent = document.querySelector(this.parentSelector);
+
+      if (!parent) {
+        return false;
+      }
+
       var bannerDiv = document.createElement('div');
-      document.querySelector('body').appendChild(bannerDiv);
+      var nextSibling = this.nextSiblingSelector ? document.querySelector(this.nextSiblingSelector) : null;
+      parent.insertBefore(bannerDiv, nextSibling);
       bannerDiv.outerHTML = this.html;
       var event = new Event('smartbanner.view');
       document.dispatchEvent(event);
@@ -459,7 +472,8 @@ var SmartBanner = /*#__PURE__*/function () {
       }
 
       var banner = document.querySelector('.js_smartbanner');
-      document.querySelector('body').removeChild(banner);
+      var parent = document.querySelector(this.parentSelector);
+      parent.removeChild(banner);
       var event = new Event('smartbanner.exit');
       document.dispatchEvent(event);
 
